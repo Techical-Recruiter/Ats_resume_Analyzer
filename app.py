@@ -12,7 +12,7 @@ load_dotenv()
 
 GEMINI_API_KEY=os.getenv("GEMINI_API_KEY")
 
-st.set_page_config("page_title="CV Ranker by Pakistan Recruitment",)
+st.set_page_config("page_title="CV Ranker by Pakistan Recruitment")
 st.title("CV Ranker")
 st.markdown("**Powered by <a href='https://PakistanRecruitment.com' target='_blank'>PakistanRecruitment</a>**", unsafe_allow_html=True)
 st.header("Match a CV with any Job Post in seconds.", divider="grey")
