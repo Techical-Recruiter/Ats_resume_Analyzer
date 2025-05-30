@@ -1,2 +1,2 @@
-# Ats_resume_Analyzer
-Helps in resume analyzing
+# CV Ranker by Pakistan Recruitment
+Helps in resume analyzing and Ranking
