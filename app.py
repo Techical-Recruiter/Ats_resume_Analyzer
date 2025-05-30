@@ -1,6 +1,6 @@
 import streamlit as st
 import PyPDF2
-from agents import Agent, Runn`er, AsyncOpenAI, OpenAIChatCompletionsModel
+from agents import Agent, Runner, AsyncOpenAI, OpenAIChatCompletionsModel
 from agents import set_tracing_disabled
 from openai.types.responses import ResponseTextDeltaEvent
 import asyncio
