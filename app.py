@@ -13,26 +13,35 @@ load_dotenv()
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-# UI configuration
-st.set_page_config(page_title="CV Ranker by Pakistan Recruitment")
+st.set_page_config(page_title="CV Ranker by Pakistan Recruitment", layout="wide")
 st.title("CV Ranker")
 st.markdown("**Powered by <a href='https://PakistanRecruitment.com' target='_blank'>PakistanRecruitment</a>**", unsafe_allow_html=True)
+st.markdown("<br><br>", unsafe_allow_html=True)
 st.header("Match a CV with any Job Post in seconds.", divider="grey")
+st.markdown("<br><br>", unsafe_allow_html=True)
 
-user_role = st.sidebar.selectbox("Select your role:", ["Job Seeker", "Recruiter"])
+with st.sidebar.container():
+    user_role = st.selectbox("Select your role:", ["Job Seeker", "Recruiter"])
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    upload_files = st.sidebar.file_uploader("Upload your resume(s)", type=["pdf", "doc", "docx"], help="Please upload one or more PDF, MS Word (.doc, .docx) files", accept_multiple_files=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
+st.markdown("<br>", unsafe_allow_html=True)
 jd = st.text_area("Paste job description", height=200)
-upload_files = st.sidebar.file_uploader("Upload your resume(s)", type=["pdf", "doc", "docx"], help="Please upload one or more PDF, MS Word (.doc, .docx) files", accept_multiple_files=True)
+st.markdown("<br>", unsafe_allow_html=True)
 submit = st.button("Submit")
+st.markdown("<br>", unsafe_allow_html=True)
 
 if user_role == "Job Seeker":
-    st.sidebar.markdown("📝 Instructions")
-    st.sidebar.markdown('''
-        **How to use:**
-        1. Upload your resume in PDF, MS Word (.doc, .docx) format.
-        2. Paste the job description in the text area.
-        3. Click Submit to analyze.
-    ''')
+    with st.sidebar.container():
+        st.markdown("📝 Instructions")
+        st.markdown('''
+            **How to use:**
+            1. Upload your resume in PDF, MS Word (.doc, .docx) format.
+            2. Paste the job description in the text area.
+            3. Click Submit to analyze.
+        ''')
+        st.markdown("<br>", unsafe_allow_html=True)
     
     def input_text(uploaded_file):
         file_name = uploaded_file.name.lower()
@@ -85,36 +94,46 @@ if user_role == "Job Seeker":
                 return
 
             upload_file = upload_files[0]
-            st.subheader(f"Analysis for Resume: {upload_file.name}")
-            text = input_text(upload_file)
-            if not text:
-                return
+            with st.container():
+                st.subheader(f"Analysis for Resume: {upload_file.name}")
+                st.markdown("<br>", unsafe_allow_html=True)
+                text = input_text(upload_file)
+                if not text:
+                    return
 
-            resume_input = f"Evaluate resume:\n{text}\n\nJob Description:\n{jd}"
-            result = Runner.run_streamed(starting_agent=agent, input=resume_input)
-            full_response = ""
-            async for event in result.stream_events():
-                if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-                    full_response += event.data.delta
+                resume_input = f"Evaluate resume:\n{text}\n\nJob Description:\n{jd}"
+                result = Runner.run_streamed(starting_agent=agent, input=resume_input)
+                full_response = ""
+                async for event in result.stream_events():
+                    if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+                        full_response += event.data.delta
 
-            response_json = extract_json_from_response(full_response)
-            if response_json:
-                display_results(response_json)
+                response_json = extract_json_from_response(full_response)
+                if response_json:
+                    display_results(response_json)
         except Exception as e:
             st.error(f"Server error: {str(e)}. Please try again later.")
 
 elif user_role == "Recruiter":
-    st.sidebar.markdown("📝 Instructions")
-    st.sidebar.markdown('''
-        **How to use:**
-        1. Upload one or more resumes in PDF, MS Word (.doc, .docx) format.
-        2. Paste the job description in the text area.
-        3. Enter must-have and good-to-have keywords.
-        4. Click Submit to analyze.
-    ''')
-    top_n = st.number_input("Select top N resumes to rank (e.g., 10, 20, 30)", min_value=1, max_value=100, value=10)
-    must_have_keywords = st.text_area("Enter must-have keywords (comma-separated)", help="e.g., Python, SQL, 5 years")
-    good_to_have_keywords = st.text_area("Enter good-to-have keywords (comma-separated)", help="e.g., JavaScript, Cloud")
+    with st.sidebar.container():
+        st.markdown("📝 Instructions")
+        st.markdown('''
+            **How to use:**
+            1. Upload one or more resumes in PDF, MS Word (.doc, .docx) format.
+            2. Paste the job description in the text area.
+            3. Enter must-have and good-to-have keywords.
+            4. Click Submit to analyze.
+        ''')
+        st.markdown("<br>", unsafe_allow_html=True)
+
+    with st.container():
+        st.markdown("<br>", unsafe_allow_html=True)
+        top_n = st.number_input("Select top N resumes to rank (e.g., 10, 20, 30)", min_value=1, max_value=100, value=10)
+        st.markdown("<br>", unsafe_allow_html=True)
+        must_have_keywords = st.text_area("Enter must-have keywords (comma-separated)", help="e.g., Python, SQL, 5 years")
+        st.markdown("<br>", unsafe_allow_html=True)
+        good_to_have_keywords = st.text_area("Enter good-to-have keywords (comma-separated)", help="e.g., JavaScript, Cloud")
+        st.markdown("<br>", unsafe_allow_html=True)
 
     def input_text(uploaded_file):
         file_name = uploaded_file.name.lower()
@@ -175,74 +194,87 @@ elif user_role == "Recruiter":
             batch_size = 10
             for batch_idx in range(0, len(upload_files), batch_size):
                 batch = upload_files[batch_idx:batch_idx + batch_size]
-                st.write(f"Processing batch {batch_idx // batch_size + 1} of {len(upload_files) // batch_size + 1}")
+                with st.container():
+                    st.write(f"Processing batch {batch_idx // batch_size + 1} of {len(upload_files) // batch_size + 1}")
+                    st.markdown("<br>", unsafe_allow_html=True)
 
-                for idx, upload_file in enumerate(batch, batch_idx + 1):
-                    st.subheader(f"Analysis for Resume {idx}: {upload_file.name}")
-                    text = input_text(upload_file)
-                    if not text:
-                        continue
+                    for idx, upload_file in enumerate(batch, batch_idx + 1):
+                        st.subheader(f"Analysis for Resume {idx}: {upload_file.name}")
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        text = input_text(upload_file)
+                        if not text:
+                            continue
 
-                    resume_input = f"Evaluate resume:\n{text}\n\nJob Description:\n{jd}"
-                    
-                    try:
-                        result = Runner.run_streamed(starting_agent=agent, input=resume_input)
-                        full_response = ""
-                        async for event in result.stream_events():
-                            if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
-                                full_response += event.data.delta
+                        resume_input = f"Evaluate resume:\n{text}\n\nJob Description:\n{jd}"
+                        
+                        try:
+                            result = Runner.run_streamed(starting_agent=agent, input=resume_input)
+                            full_response = ""
+                            async for event in result.stream_events():
+                                if event.type == "raw_response_event" and isinstance(event.data, ResponseTextDeltaEvent):
+                                    full_response += event.data.delta
 
-                        response_json = extract_json_from_response(full_response)
-                        if response_json:
-                            resume_text = text.lower()
-                            has_must_have = any(keyword.lower() in resume_text for keyword in must_have_list) if must_have_list else True
-                            if has_must_have:
-                                has_good_to_have = any(keyword.lower() in resume_text for keyword in good_to_have_list) if good_to_have_list else True
-                                if has_good_to_have:
-                                    response_json["resume_index"] = idx
-                                    results.append(response_json)
-                    except Exception as e:
-                        st.error(f"Error analyzing resume {idx}: {str(e)}. Skipping this resume.")
+                            response_json = extract_json_from_response(full_response)
+                            if response_json:
+                                resume_text = text.lower()
+                                has_must_have = any(keyword.lower() in resume_text for keyword in must_have_list) if must_have_list else True
+                                if has_must_have:
+                                    has_good_to_have = any(keyword.lower() in resume_text for keyword in good_to_have_list) if good_to_have_list else True
+                                    if has_good_to_have:
+                                        response_json["resume_index"] = idx
+                                        results.append(response_json)
+                        except Exception as e:
+                            st.error(f"Error analyzing resume {idx}: {str(e)}. Skipping this resume.")
 
             if not results:
                 st.error("No resumes matched the criteria. Please check keywords or upload different resumes.")
             else:
-                st.write(f"Total matched resumes: {len(results)}")
-                results.sort(key=lambda x: int(x["##JD Match"].replace("%", "")), reverse=True)
-                st.subheader(f"Top {top_n} Ranked Resumes")
-                for i, result in enumerate(results[:top_n], 1):
-                    st.subheader(f"Rank {i}: Resume {result['resume_index']} - {upload_files[result['resume_index'] - 1].name}")
-                    display_results(result)
-                if len(results) < top_n:
-                    st.warning(f"Only {len(results)} resumes matched the criteria, less than the requested top {top_n}.")
+                with st.container():
+                    st.write(f"Total matched resumes: {len(results)}")
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    results.sort(key=lambda x: int(x["##JD Match"].replace("%", "")), reverse=True)
+                    st.subheader(f"Top {top_n} Ranked Resumes")
+                    st.markdown("<br>", unsafe_allow_html=True)
+                    for i, result in enumerate(results[:top_n], 1):
+                        st.subheader(f"Rank {i}: Resume {result['resume_index']} - {upload_files[result['resume_index'] - 1].name}")
+                        st.markdown("<br>", unsafe_allow_html=True)
+                        display_results(result)
+                    if len(results) < top_n:
+                        st.warning(f"Only {len(results)} resumes matched the criteria, less than the requested top {top_n}.")
 
         except Exception as e:
             st.error(f"Server error: {str(e)}. Please try again later.")
 
 def display_results(data):
-    st.subheader("Analysis Results")
-    
-    if isinstance(data, dict): 
-        st.metric("JD Match", data.get("##JD Match", "N/A"))
+    with st.container():
+        st.subheader("Analysis Results")
+        st.markdown("<br>", unsafe_allow_html=True)
         
-        if "Recruiter" in user_role:
-            st.write("**Matching Keywords:**")
-            if matching_keywords := data.get("##Matching Keywords", []):
-                st.table(matching_keywords)
-            else:
-                st.write("No matching keywords found")
+        if isinstance(data, dict): 
+            st.metric("JD Match", data.get("##JD Match", "N/A"))
+            st.markdown("<br>", unsafe_allow_html=True)
             
-            st.write("**Missing Keywords:**")
-            if keywords := data.get("##Missing Keywords", []):
-                st.table(keywords)
-            else:
-                st.write("No missing keywords found")
-        
-        st.write("**Profile Summary:**")
-        st.write(data.get("##Profile Summary", "N/A"))
-    else:
-        st.error("Could not parse response. Raw output:")
-        st.code(data)
+            if "Recruiter" in user_role:
+                st.write("**Matching Keywords:**")
+                if matching_keywords := data.get("##Matching Keywords", []):
+                    st.table(matching_keywords)
+                else:
+                    st.write("No matching keywords found")
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                st.write("**Missing Keywords:**")
+                if keywords := data.get("##Missing Keywords", []):
+                    st.table(keywords)
+                else:
+                    st.write("No missing keywords found")
+                st.markdown("<br>", unsafe_allow_html=True)
+            
+            st.write("**Profile Summary:**")
+            st.write(data.get("##Profile Summary", "N/A"))
+            st.markdown("<br>", unsafe_allow_html=True)
+        else:
+            st.error("Could not parse response. Raw output:")
+            st.code(data)
 
 if submit:
     if user_role == "Job Seeker":
