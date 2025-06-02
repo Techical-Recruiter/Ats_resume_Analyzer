@@ -3,3 +3,4 @@ PyPDF2==3.0.1
 openai==1.79.0
 openai-agents==0.0.15
 python-dotenv==1.0.1
+python-docx==1.1.2
