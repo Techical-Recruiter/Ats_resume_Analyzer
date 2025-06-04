@@ -47,6 +47,7 @@ if "user_role" not in st.session_state:
     user_role = st.selectbox("Are you a:", ["Job Seeker", "Recruiter"])
     if st.button("Continue"):
         st.session_state.user_role = user_role
+        st.rerun()
 else:
     user_role = st.session_state.user_role
     st.title("CV Ranker")
