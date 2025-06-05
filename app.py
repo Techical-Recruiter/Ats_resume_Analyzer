@@ -52,9 +52,9 @@ else:
     user_role = st.session_state.user_role
     st.title("CV Ranker")
     st.markdown("**Powered by <a href='https://PakistanRecruitment.com' target='_blank'>PakistanRecruitment</a>**", unsafe_allow_html=True)
-    st.header("Match a CV with any Job Post in seconds.", divider="grey")
 
     if user_role == "Job Seeker":
+        st.header("Match your CV with any Job Post in seconds.", divider="grey")
         st.markdown('''
             **How to use:**
             1. Upload your resume in PDF, MS Word (.doc, .docx) format.
@@ -139,6 +139,7 @@ else:
             asyncio.run(analyze_resume_basic())
 
     elif user_role == "Recruiter":
+        st.header("Match. Rank. Hire Fast", divider="grey")
         st.markdown('''
             **How to use:**
             1. Upload one or more resumes in PDF, MS Word (.doc, .docx) format.
