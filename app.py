@@ -258,13 +258,11 @@ elif st.session_state.current_page == "job_seeker_dashboard":
         st.subheader("Detailed Analysis Results")
 
         if isinstance(data, dict):
-            # Changed st.metric to st.write for "Overall JD Match Score" to prevent truncation
             st.write(f"**Overall JD Match Score:** {data.get('##JD Match', 'N/A')}")
 
             st.subheader("Qualifications Breakdown", divider="blue")
             quals = data.get("##Qualifications Analysis", {})
 
-            # Changed st.metric to st.write for full text display
             st.write(f"**Experience Match:** {quals.get('Experience Comparison', 'N/A')}")
             st.write(f"**Education Match:** {quals.get('Education Match', 'N/A')}")
 
@@ -282,7 +280,6 @@ elif st.session_state.current_page == "job_seeker_dashboard":
             else:
                 st.info("No major skill gaps identified")
 
-            # Improvement Suggestions
             st.subheader("Career Improvement Advice", divider="green")
             improvements = data.get("##Improvement Suggestions", {})
 
@@ -300,10 +297,8 @@ elif st.session_state.current_page == "job_seeker_dashboard":
             else:
                 st.write("No specific advice available")
 
-            # Changed st.metric to st.write for "Overall Career Fit" to prevent truncation
             st.write(f"**Overall Career Fit:** {improvements.get('Career Fit', 'N/A')}")
 
-            # Matching/Missing Keywords
             st.subheader("Keyword Analysis", divider="orange")
 
             col1, col2 = st.columns(2)
@@ -321,7 +316,6 @@ elif st.session_state.current_page == "job_seeker_dashboard":
                 else:
                     st.write("None found")
 
-            # Profile Summary
             st.subheader("Career Counselor's Summary", divider="blue")
             st.write(data.get("##Profile Summary", "No summary available"))
 
@@ -423,7 +417,6 @@ elif st.session_state.current_page == "recruiter_dashboard":
     is_temp_recruiter = logged_in_user == "recruiter_temp"
     if is_temp_recruiter:
         remaining_cvs = 10 - st.session_state.unregistered_recruiter_cv_count
-        # Make the warning more concise and remove redundant "Guest Recruiter Access" part
         st.warning(f"Analyze {remaining_cvs} more CVs for free. To remove limits and access premium features, please sign up.")
         if st.button("Sign Up Now"):
             st.session_state.current_page = "recruiter_signup"
