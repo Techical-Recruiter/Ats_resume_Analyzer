@@ -9,6 +9,7 @@ import json
 import re
 import os
 from datetime import datetime, timedelta
+import pandas as pd 
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -453,6 +454,7 @@ elif st.session_state.current_page == "recruiter_dashboard":
             )
             model = OpenAIChatCompletionsModel(model="gemini-2.0-flash", openai_client=provider)
             set_tracing_disabled(disabled=True)
+
             agent = Agent(
                 name="ATS Agent",
                 instructions="""
@@ -461,7 +463,16 @@ elif st.session_state.current_page == "recruiter_dashboard":
                 - Missing keywords
                 - Matching keywords (keywords from the job description that are present in the resume)
                 - Profile summary
-                Return ONLY valid JSON format: {"##JD Match": "X%", "##Missing Keywords": [], "##Matching Keywords": [], "##Profile Summary": "..."}
+                - Candidate's total years of experience
+                - Key skill strengths
+                Return ONLY valid JSON format: {
+                    "##JD Match": "X%",
+                    "##Missing Keywords": [],
+                    "##Matching Keywords": [],
+                    "##Profile Summary": "...",
+                    "##Years of Experience": "Y years",
+                    "##Key Skill Strengths": ["skill1", "skill2"]
+                }
                 Keep your response short and complete you response within 100 words. Just be honest about your response because it is the question of company's policy and future i will tip you 20000 dollars for best satisfying responses.
                 """,
                 model=model,
@@ -472,6 +483,8 @@ elif st.session_state.current_page == "recruiter_dashboard":
             must_have_list = [kw.strip() for kw in must_have_keywords.split(",")] if must_have_keywords else []
             good_to_have_list = [kw.strip() for kw in good_to_have_keywords.split(",")] if good_to_have_keywords else []
             results = []
+            comparison_data = [] 
+
             resume_count = len(upload_files)
             if not is_temp_recruiter:
                 plan = st.session_state.USERS[logged_in_user]["plan"]
@@ -505,6 +518,17 @@ elif st.session_state.current_page == "recruiter_dashboard":
                                     response_json["resume_index"] = idx
                                     response_json["resume_name"] = upload_file.name
                                     results.append(response_json)
+
+                                    experience = response_json.get("##Years of Experience", "N/A")
+                                    skills = ", ".join(response_json.get("##Key Skill Strengths", []))
+                                    percentage = response_json.get("##JD Match", "N/A")
+                                    comparison_data.append({
+                                        "Resume Name": upload_file.name,
+                                        "Years of Experience": experience,
+                                        "Skill Set": skills,
+                                        "Match Score": percentage
+                                    })
+
                     except Exception as e:
                         st.error(f"Error analyzing resume {idx}: {str(e)}. Skipping this resume.")
             if not results:
@@ -526,6 +550,14 @@ elif st.session_state.current_page == "recruiter_dashboard":
                     display_results(result)
                 if len(results) < top_n:
                     st.warning(f"Only {len(results)} resumes matched the criteria, less than the requested top {top_n}.")
+
+                if comparison_data:
+                    st.subheader("Comparison of Qualified Candidates")
+                    df_comparison = pd.DataFrame(comparison_data)
+                    df_comparison['Match Score Value'] = df_comparison['Match Score'].str.replace('%', '').astype(int)
+                    df_comparison = df_comparison.sort_values(by='Match Score Value', ascending=False).drop(columns=['Match Score Value'])
+                    st.dataframe(df_comparison)
+
         except Exception as e:
             st.error(f"Server error: {str(e)}. Please try again later.")
     if submit:
