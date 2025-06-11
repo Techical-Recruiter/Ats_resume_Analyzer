@@ -17,7 +17,6 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
 st.set_page_config(page_title="CV Ranker - Recruiter")
 
-# --- Session State Management for Recruiter App ---
 if 'USERS' not in st.session_state:
     st.session_state.USERS = {"admin": {"password": "password123", "email": "admin@example.com", "plan": None}}
 if 'logged_in_user' not in st.session_state:
@@ -29,7 +28,6 @@ if 'unregistered_recruiter_cv_count' not in st.session_state:
 if 'processed_resume_names' not in st.session_state:
     st.session_state.processed_resume_names = set()
 
-# Initialize per-user resume count if a logged_in_user exists and it's not the temp recruiter
 if st.session_state.logged_in_user and st.session_state.logged_in_user != "recruiter_temp":
     if f"{st.session_state.logged_in_user}_recruiter_resumes_analyzed" not in st.session_state:
         st.session_state[f"{st.session_state.logged_in_user}_recruiter_resumes_analyzed"] = 0
@@ -37,7 +35,6 @@ if st.session_state.logged_in_user and st.session_state.logged_in_user != "recru
         st.session_state[f"{st.session_state.logged_in_user}_cooldown_end_time"] = None
 
 
-# --- Helper Functions (same as before) ---
 def input_text(uploaded_file):
     file_name = uploaded_file.name.lower()
     text = ""
@@ -101,7 +98,7 @@ def display_recruiter_pricing_plans():
                 st.session_state.current_page = "recruiter_dashboard"
                 st.rerun()
             else:
-                st.session_state.logged_in_user = "recruiter_temp" # Allow unregistered access to dashboard
+                st.session_state.logged_in_user = "recruiter_temp" 
                 st.session_state.current_page = "recruiter_dashboard"
                 st.rerun()
     with col2:
@@ -128,7 +125,7 @@ def display_recruiter_pricing_plans():
         if st.button("Upgrade to Premium", key="recruiter_premium_plan"):
             st.markdown(
                 """
-                        <a href="https://pakistanrecruitment.com/" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                        <a href="https://pakistanrecruitment.com/ai-recruitment-agents/" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
                             <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
                                 Proceed to Payment
                             </button>
@@ -218,18 +215,15 @@ async def analyze_resume_recruiter(upload_files, jd, must_have_keywords, good_to
                     response_json = extract_json_from_response(full_response)
                     if response_json:
                         resume_text = text.lower()
-                        # Ensure all must-have keywords are present
                         has_must_have = all(keyword.lower() in resume_text for keyword in must_have_list) if must_have_list else True
 
                         if has_must_have:
-                            # If must-have keywords are present, check for good-to-have
                             has_good_to_have = any(keyword.lower() in resume_text for keyword in good_to_have_list) if good_to_have_list else True
-                            if has_good_to_have: # Only include if at least one good-to-have is present
+                            if has_good_to_have: 
                                 response_json["resume_index"] = idx
                                 response_json["resume_name"] = upload_file.name
                                 results.append(response_json)
 
-                                # Extract data for comparison table
                                 experience = response_json.get("##Years of Experience", "N/A")
                                 skills = ", ".join(response_json.get("##Key Skill Strengths", []))
                                 percentage = response_json.get("##JD Match", "N/A")
@@ -276,7 +270,6 @@ async def analyze_resume_recruiter(upload_files, jd, must_have_keywords, good_to
     except Exception as e:
         st.error(f"Server error: {str(e)}. Please try again later.")
 
-# --- Recruiter App UI Logic ---
 def recruiter_app():
     if st.session_state.current_page == "login_signup":
         st.title("CV Ranker - Recruiter Access")
