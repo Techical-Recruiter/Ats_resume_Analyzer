@@ -111,7 +111,7 @@ def display_recruiter_pricing_plans():
         if st.button("Upgrade to Basic", key="recruiter_basic_plan"):
             st.markdown(
                 """
-                        <a href="https://pakistanrecruitment.com/" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+                        <a href="https://pakistanrecruitment.com/ai-recruitment-agents/" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
                             <button style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">
                                 Proceed to Payment
                             </button>
